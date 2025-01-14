@@ -76,6 +76,7 @@ void setupWifi()
   Serial.println("WiFi connected");
   Serial.println("IP address: ");
   Serial.println(WiFi.localIP());
+  drawMatrix(wifiSymbol, 8, 8, green_color);
 }
 // Create a new row with the current data
 int8_t *createCurrentDataRow(int value)
@@ -154,15 +155,15 @@ void reconnectMQTT()
       Serial.println("connected");
       // subscribe to the current power consumption topic
       client.subscribe(MQTT_CurrentPowerConsumptionTopic);
-      // Draw check mark
-      drawMatrix(checkMark, 8, 8, green_color);
+      
+      drawMatrix(mLetter, 8, 8, green_color);
     }
     else
     {
       Serial.print("failed, rc=");
       Serial.print(client.state());
       Serial.println(" try again in 5 seconds");
-      drawMatrix(questionMark, 8, 8, red_color);
+      drawMatrix(mLetter, 8, 8, red_color);
       // Wait 5 seconds before retrying
       delay(5000);
     }
