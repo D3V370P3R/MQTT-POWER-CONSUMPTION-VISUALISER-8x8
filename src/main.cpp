@@ -6,10 +6,18 @@
 
 #include <WiFi.h>
 #include <PubSubClient.h>
-#include "config.h" // Include the configuration file
 #include "symbols.h"
-#define LED_PIN 13
-#define LED_COUNT 64
+
+#define USE_DUMMY_CONFIG 1
+
+#if USE_DUMMY_CONFIG
+#include "dummy_config.h"
+#else
+#include "config.h" // Include the configuration file with real security credentials
+#endif
+
+#define LED_PIN 13 // Pin where the NeoPixel strip is connected
+#define LED_COUNT 64 // Number of LEDs in the strip
 
 Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
 static uint32_t green_color = strip.Color(0, 255, 0);
