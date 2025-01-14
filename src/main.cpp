@@ -85,19 +85,19 @@ int8_t *createCurrentDataRow(int value)
   case 500 ... 999:
     mapped = 2;
     break;
-  case 200 ... 499:
+  case 100 ... 499:
     mapped = 3;
     break;
-  case -99 ... 199:
+  case -99 ... 99:
     mapped = 4;
     break;
-  case -200 ... - 100:
+  case -300 ... - 100:
     mapped = 5;
     break;
-  case -400 ... - 201:
+  case -500 ... - 301:
     mapped = 6;
     break;
-  case INT_MIN ... - 401:
+  case INT_MIN ... - 501:
     mapped = 7;
     break;
   default:
