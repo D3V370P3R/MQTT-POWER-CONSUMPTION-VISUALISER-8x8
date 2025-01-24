@@ -16,13 +16,14 @@
 #include "config.h" // Include the configuration file with real security credentials
 #endif
 
-#define LED_PIN 13 // Pin where the NeoPixel strip is connected
+#define LED_PIN 13   // Pin where the NeoPixel strip is connected
 #define LED_COUNT 64 // Number of LEDs in the strip
 
 Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
 static uint32_t green_color = strip.Color(0, 255, 0);
 static uint32_t red_color = strip.Color(255, 0, 0);
 static uint32_t white_color = strip.Color(255, 255, 255);
+static uint32_t gray_color = strip.Color(128, 128, 128);
 
 // Define color gradients from green to red in 8 steps
 uint32_t colorGradient[8] = {
@@ -64,10 +65,28 @@ void setupWifi()
 
   WiFi.begin(ssid, password);
 
+  bool tickTock = true;
+  // Wait for wifi to be connected
+  uint32_t notConnectedCounter = 0;
   while (WiFi.status() != WL_CONNECTED)
   {
     delay(500);
-    Serial.print(".");
+    if (tickTock)
+    {
+      drawMatrix(wifiSymbol2, 8, 8, gray_color);
+    }
+    else
+    {
+      drawMatrix(wifiSymbol, 8, 8, white_color);
+    }
+    notConnectedCounter++;
+    if (notConnectedCounter > 150)
+    { // Reset board if not connected after 150 attempts
+      Serial.println("Resetting due to Wifi not connecting...");
+      ESP.restart();
+    }
+    tickTock = !tickTock;
+    Serial.print(WiFi.status());
   }
 
   randomSeed(micros());
@@ -155,7 +174,7 @@ void reconnectMQTT()
       Serial.println("connected");
       // subscribe to the current power consumption topic
       client.subscribe(MQTT_CurrentPowerConsumptionTopic);
-      
+
       drawMatrix(mLetter, 8, 8, green_color);
     }
     else
@@ -246,7 +265,7 @@ void setup()
   strip.setBrightness(255);
   strip.show();
 
-  // Initialize WiFi and MQTT 
+  // Initialize WiFi and MQTT
   setupWifi();
   client.setServer(mqtt_server, 1883);
   client.setCallback(callback);
@@ -254,11 +273,13 @@ void setup()
 
 void loop()
 {
-  if (!client.connected())
+  if (WiFi.status() != WL_CONNECTED)
   {
     // If WiFi client is not connected, try to reconnect WiFi
     setupWifi();
-
+  }
+  if (!client.connected())
+  {
     reconnectMQTT();
   }
   client.loop();
