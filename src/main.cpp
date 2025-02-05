@@ -185,6 +185,7 @@ void reconnectMQTT()
       drawMatrix(mLetter, 8, 8, red_color);
       // Wait 5 seconds before retrying
       delay(5000);
+      ESP.restart();
     }
   }
 }
